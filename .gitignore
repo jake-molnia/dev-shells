@@ -1,0 +1,50 @@
+# Nix build outputs
+result
+result-*
+
+# Nix flake lockfile (we dotn commit as this is just to store common configs and the flakes should be modified on a project to projetc basis)
+flake.lock
+
+# Nix store paths and garbage collection roots
+.direnv/
+.devenv/
+
+# Nix development shell
+.envrc.local
+
+# Common editor/system files
+.vscode/
+.idea/
+*.swp
+*~
+.DS_Store
+
+# Nix related caches
+.pre-commit-config.yaml
+
+# Nix CI/CD
+.nixci/
+
+# Nix specific temporary files
+nix-shell.*/
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Build artifacts for various languages
+# (customize based on what languages you use in your project)
+*.o
+*.a
+*.so
+*.dylib
+*.exe
+*.out
+*.app
+__pycache__/
+*.py[cod]
+node_modules/
+dist/
+build/
