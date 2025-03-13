@@ -22,7 +22,7 @@
     {
       templates.default = {
         path = ./.;
-        description = "Python env template with dev container";
+        description = "Python env nix flake template with dev container";
       };
     } // flake-utils.lib.eachDefaultSystem (system:
       let
@@ -122,7 +122,7 @@
             profile = "black"
             
             [tool.mypy]
-            python_version = "3.11"
+            python_version = "3.12"
             warn_return_any = true
             warn_unused_configs = true
             disallow_untyped_defs = true
@@ -130,7 +130,7 @@
             
             [tool.ruff]
             line-length = 88
-            target-version = "py311"
+            target-version = "py313"
             select = ["E", "F", "B", "I"]
             EOF
             fi
@@ -177,11 +177,11 @@
               cat > .devcontainer/devcontainer.json << EOF
             {
               "name": "${pname}",
-              "image": "mcr.microsoft.com/devcontainers/python:3.11",
+              "image": "mcr.microsoft.com/devcontainers/python:3.13",
               "features": {
                 "ghcr.io/devcontainers/features/node:1": {}
               },
-              "postCreateCommand": "pip install -r requirements.txt || pip install pytest black isort ruff mypy",
+              "postCreateCommand": "pip install -r requirements.txt || pip install pytest black isort ruff mypy uv",
               "customizations": {
                 "vscode": {
                   "extensions": [
@@ -211,37 +211,6 @@
             }
             EOF
               
-              # Create a Dockerfile (optional - for additional customization)
-              cat > .devcontainer/Dockerfile << EOF
-            FROM mcr.microsoft.com/devcontainers/python:3.11
-            
-            # Install additional system packages if needed
-            # RUN apt-get update && apt-get install -y additional-package
-            
-            # Set up Python environment
-            WORKDIR /workspaces/${pname}
-            
-            # Install Python dependencies
-            COPY requirements.txt* .
-            RUN if [ -f "requirements.txt" ]; then pip install -r requirements.txt; else pip install pytest black isort ruff mypy; fi
-            
-            # Install development tools
-            RUN pip install ipython ipdb
-            EOF
-              
-              # Create a docker-compose.yml (optional)
-              cat > .devcontainer/docker-compose.yml << EOF
-            version: '3'
-            services:
-              app:
-                build: 
-                  context: ..
-                  dockerfile: .devcontainer/Dockerfile
-                volumes:
-                  - ..:/workspaces/${pname}:cached
-                command: sleep infinity
-            EOF
-              
               # Create a devcontainer.Dockerfile
               cat > .devcontainer/devcontainer.Dockerfile << EOF
             FROM mcr.microsoft.com/devcontainers/python:3.11
@@ -253,7 +222,7 @@
                 curl \\
                 wget
             
-            # Install pip tools wanted (uv or poetru)
+            # Install pip tools wanted (uv or poetry)
             RUN pip install uv
 
             # Install Python tools globally
