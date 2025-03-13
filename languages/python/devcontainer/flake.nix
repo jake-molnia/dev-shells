@@ -130,7 +130,7 @@
             
             [tool.ruff]
             line-length = 88
-            target-version = "py313"
+            target-version = "py312"
             select = ["E", "F", "B", "I"]
             EOF
             fi
@@ -177,7 +177,7 @@
               cat > .devcontainer/devcontainer.json << EOF
             {
               "name": "${pname}",
-              "image": "mcr.microsoft.com/devcontainers/python:3.13",
+              "image": "mcr.microsoft.com/devcontainers/python:3.12",
               "features": {
                 "ghcr.io/devcontainers/features/node:1": {}
               },
@@ -213,7 +213,7 @@
               
               # Create a devcontainer.Dockerfile
               cat > .devcontainer/devcontainer.Dockerfile << EOF
-            FROM mcr.microsoft.com/devcontainers/python:3.11
+            FROM mcr.microsoft.com/devcontainers/python:3.12
             
             # Install additional packages
             RUN apt-get update && apt-get install -y \\
