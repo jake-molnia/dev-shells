@@ -22,7 +22,7 @@
     {
       templates.default = {
         path = ./.;
-        description = "Python development environment with DevContainer support";
+        description = "Python env template with dev container";
       };
     } // flake-utils.lib.eachDefaultSystem (system:
       let
@@ -30,16 +30,16 @@
         pkgs = import nixpkgs {
           inherit system;
           # Enable non-free packages if needed
-          # config.allowUnfree = true;
+          config.allowUnfree = true;
         };
 
         # Python version selection
         # Choose your Python version by changing this line
-        python = pkgs.python311;
+        python = pkgs.python312;
 
         # Project name and version
-        pname = "my-python-project";
-        version = "0.1.0";
+        pname = "CHANGE-ME";
+        version = "0.0.0";
 
         # Python packages (dependencies)
         pythonPackages = with python.pkgs; [
@@ -71,10 +71,6 @@
           # numpy
           # pandas
           # matplotlib
-          # requests
-          # fastapi
-          # sqlalchemy
-          # pydantic
         ];
 
         # Development shell script helpers
@@ -257,6 +253,9 @@
                 curl \\
                 wget
             
+            # Install pip tools wanted (uv or poetru)
+            RUN pip install uv
+
             # Install Python tools globally
             RUN pip install black isort ruff mypy pytest
             EOF
@@ -299,7 +298,7 @@
       {
         # Development shell
         devShells.default = pkgs.mkShell {
-          name = "${pname}-devcontainer-shell";
+          name = "${pname}";
 
           # Packages available in the development shell
           packages = with pkgs; [
