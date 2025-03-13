@@ -8,7 +8,7 @@
   inputs = {
     # Nixpkgs - Main package source
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    
+
     # Flake-utils - Simplifies flake output definitions for multiple systems
     flake-utils.url = "github:numtide/flake-utils";
   };
@@ -18,7 +18,13 @@
   # What this flake produces (packages, devShells, etc.)
   # ============================================================================
   outputs = { self, nixpkgs, flake-utils, ... }@inputs:
-    flake-utils.lib.eachDefaultSystem (system:
+    # Define top-level template for direct initialization
+    {
+      templates.default = {
+        path = ./.;
+        description = "Python development environment with DevContainer support";
+      };
+    } // flake-utils.lib.eachDefaultSystem (system:
       let
         # System-specific package set
         pkgs = import nixpkgs {
@@ -26,15 +32,15 @@
           # Enable non-free packages if needed
           # config.allowUnfree = true;
         };
-        
+
         # Python version selection
         # Choose your Python version by changing this line
         python = pkgs.python311;
-        
+
         # Project name and version
         pname = "my-python-project";
         version = "0.1.0";
-        
+
         # Python packages (dependencies)
         pythonPackages = with python.pkgs; [
           # Development tools
@@ -42,25 +48,25 @@
           uv
           setuptools
           wheel
-          
+
           # Testing frameworks
           pytest
           pytest-cov
           pytest-xdist
-          
+
           # Code quality tools
           black
           isort
           ruff
           mypy
-          
+
           # Documentation
           sphinx
-          
+
           # Debugging
           ipython
           ipdb
-          
+
           # OPTIONAL: Common libraries (uncomment as needed)
           # numpy
           # pandas
@@ -77,7 +83,7 @@
           pytest-run = pkgs.writeShellScriptBin "pytest-run" ''
             pytest -xvs "$@"
           '';
-          
+
           # Code formatting
           format-code = pkgs.writeShellScriptBin "format-code" ''
             echo "Formatting imports with isort..."
@@ -87,20 +93,20 @@
             echo "Checking code with ruff..."
             ruff check --fix .
           '';
-          
+
           # Create uv requirements files from environment
           uv-requirements = pkgs.writeShellScriptBin "uv-requirements" ''
             uv pip freeze > requirements.txt
             echo "Generated requirements.txt"
           '';
-          
+
           # Create virtual environment using uv
           uv-venv = pkgs.writeShellScriptBin "uv-venv" ''
             uv venv
             echo "Created virtual environment in .venv/"
             echo "Activate with: source .venv/bin/activate"
           '';
-          
+
           # Initialize project structure
           init-project = pkgs.writeShellScriptBin "init-project" ''
             if [ ! -f "pyproject.toml" ]; then
@@ -164,7 +170,7 @@
             
             echo "Project initialized!"
           '';
-          
+
           # Create DevContainer configuration
           create-devcontainer = pkgs.writeShellScriptBin "create-devcontainer" ''
             # Create a .devcontainer directory with devcontainer.json
@@ -260,7 +266,7 @@
               echo "DevContainer configuration already exists."
             fi
           '';
-          
+
           # Script to launch VSCode with DevContainer
           launch-devcontainer = pkgs.writeShellScriptBin "launch-devcontainer" ''
             # First, ensure the project is initialized
@@ -288,29 +294,30 @@
             fi
           '';
         };
-        
-      in {
+
+      in
+      {
         # Development shell
         devShells.default = pkgs.mkShell {
           name = "${pname}-devcontainer-shell";
-          
+
           # Packages available in the development shell
           packages = with pkgs; [
             # Core Nix tools
             nixpkgs-fmt
-            
+
             # Python packages
             python
             pythonPackages
-            
+
             # Docker for DevContainer
             docker
             docker-compose
-            
+
             # Shell scripts defined above
             (builtins.attrValues shellScripts)
           ];
-          
+
           # Set up the shell environment
           shellHook = ''
             # Welcome message
@@ -362,12 +369,7 @@
             export PYTHONPATH="$PWD:$PYTHONPATH"
           '';
         };
-        
-        # Templates definition
-        templates.default = {
-          path = ./.;
-          description = "Python development environment with DevContainer support";
-        };
+
       }
     );
 }
